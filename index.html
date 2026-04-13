@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>不要说挑战</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a18cd1, #fbc2eb, #a6c1ee, #84fab0);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    /* 标题样式 */
+    .title {
+      font-size: 36px;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+      margin-bottom: 40px;
+      animation: bounce 2s ease infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* 卡片容器 */
+    .card-container {
+      perspective: 1000px;
+      margin-bottom: 30px;
+    }
+
+    /* 卡片样式 */
+    .card {
+      width: 100%;
+      min-height: 350px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 30px;
+      position: relative;
+      transition: transform 0.6s ease;
+      transform-style: preserve-3d;
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      backface-visibility: hidden;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 30px;
+      border-radius: 24px;
+    }
+
+    .card-front {
+      transform: rotateY(180deg);
+    }
+
+    .card-back {
+      background: rgba(255,255,255,0.95);
+    }
+
+    /* 卡片类型样式 */
+    .card.language {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .card.action {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .card.expression {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    /* 卡片文字 */
+    .card-text {
+      font-size: 56px;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      line-height: 1.2;
+    }
+
+    /* 等待界面 */
+    .waiting-card {
+      background: rgba(255,255,255,0.95);
+    }
+
+    .waiting-text {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 30px;
+      line-height: 1.4;
+    }
+
+    /* 倒计时 */
+    .countdown {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 48px;
+      font-weight: 800;
+      color: #fff;
+      animation: pulse 1s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* 按钮样式 */
+    .btn {
+      padding: 18px 50px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* 重抽按钮 */
+    .btn-again {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      box-shadow: 0 10px 30px rgba(17, 153, 142, 0.4);
+    }
+
+    .btn-again:hover {
+      box-shadow: 0 15px 40px rgba(17, 153, 142, 0.5);
+    }
+
+    /* 隐藏元素 */
+    .hidden {
+      display: none !important;
+    }
+
+    /* 入场动画 */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 初始界面 -->
+    <div id="start-screen">
+      
+      <div class="card-container">
+        <div class="card waiting-card">
+          <div style="font-size: 20px; color: #666; font-weight: 600;">
+            请点击 开始抽卡
+          </div>
+        </div>
+      </div>
+      <button class="btn" id="start-btn">开始抽卡</button>
+    </div>
+
+    <!-- 等待界面 -->
+    <div id="waiting-screen" class="hidden">
+      
+      <div class="card-container">
+        <div class="card waiting-card">
+          <div class="waiting-text">请把手机<br>面向他人</div>
+          <div class="countdown" id="countdown">3</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 卡片展示界面 -->
+    <div id="card-screen" class="hidden">
+      
+      <div class="card-container">
+        <div class="card" id="result-card">
+          <div class="card-front">
+            <div class="card-text" id="card-text">说绩效</div>
+          </div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <button class="btn btn-again" id="again-btn">重新抽卡</button>
+    </div>
+  </div>
+
+  <script>
+    // 词库数据 - 语言类45张（大部分）
+    const languageCards = [
+      "说绩效", "说排班", "说用户", "说流程", "说系统",
+      "说单休", "说在线", "说热线", "说消费者", "说工单",
+      "说标准问", "说知识库", "说商家", "说投诉", "说反馈",
+      "说满意度", "说响应", "说处理", "说记录", "说转接",
+      "说MOD", "说TL", "说小组", "说加班", "说客服",
+      "说电话", "说消息", "说回复",
+      "说解决", "说跟进", "说确认", "说收到", "说好的",
+      "说问题", "说咨询", "说业务", "说规则", "说政策",
+      "说话术", "说培训", "说考试", "说考核", "说指标",
+      "说数据", "说报表"
+    ];
+
+    // 头部/嘴部动作15张（不用手）
+    const actionCards = [
+      "点头", "摇头", "抿嘴", "张嘴", "咬嘴唇",
+      "歪头", "转头", "闭眼", "眯眼", "吐舌头",
+      "鼓腮帮", "皱眉", "扬眉", "伸舌头", "叹气"
+    ];
+
+    // 表情类已合并到动作类
+    const expressionCards = [];
+
+    // DOM 元素
+    const startScreen = document.getElementById('start-screen');
+    const waitingScreen = document.getElementById('waiting-screen');
+    const cardScreen = document.getElementById('card-screen');
+    const startBtn = document.getElementById('start-btn');
+    const againBtn = document.getElementById('again-btn');
+    const countdown = document.getElementById('countdown');
+    const resultCard = document.getElementById('result-card');
+    const cardText = document.getElementById('card-text');
+
+    // 抽卡函数
+    function drawCard() {
+      const allCards = [
+        ...languageCards.map(text => ({ text, type: 'language' })),
+        ...actionCards.map(text => ({ text, type: 'action' })),
+        ...expressionCards.map(text => ({ text, type: 'expression' }))
+      ];
+      
+      const randomIndex = Math.floor(Math.random() * allCards.length);
+      return allCards[randomIndex];
+    }
+
+    // 显示卡片
+    function showCard(card) {
+      // 移除之前的类型类
+      resultCard.classList.remove('language', 'action', 'expression');
+      // 添加新的类型类
+      resultCard.classList.add(card.type);
+      
+      // 设置文字
+      cardText.textContent = card.text;
+      
+      // 翻转动画
+      resultCard.classList.add('flipped');
+    }
+
+    // 重置卡片
+    function resetCard() {
+      resultCard.classList.remove('flipped');
+    }
+
+    // 开始倒计时并显示卡片
+    function startCountdown(callback) {
+      let count = 3;
+      countdown.textContent = count;
+      
+      const timer = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countdown.textContent = count;
+        } else {
+          clearInterval(timer);
+          callback();
+        }
+      }, 1000);
+    }
+
+    // 开始抽卡
+    function startGame() {
+      // 隐藏开始界面，显示等待界面
+      startScreen.classList.add('hidden');
+      waitingScreen.classList.remove('hidden');
+      waitingScreen.classList.add('fade-in');
+      
+      // 禁用开始按钮
+      startBtn.disabled = true;
+      
+      // 开始倒计时
+      startCountdown(() => {
+        // 显示卡片界面
+        waitingScreen.classList.add('hidden');
+        cardScreen.classList.remove('hidden');
+        cardScreen.classList.add('fade-in');
+        
+        // 抽卡并显示
+        const card = drawCard();
+        setTimeout(() => showCard(card), 100);
+      });
+    }
+
+    // 重新抽卡
+    function againGame() {
+      // 禁用重抽按钮
+      againBtn.disabled = true;
+      
+      // 重置卡片
+      resetCard();
+      
+      // 显示等待界面
+      cardScreen.classList.add('hidden');
+      waitingScreen.classList.remove('hidden');
+      waitingScreen.classList.add('fade-in');
+      
+      // 开始倒计时
+      startCountdown(() => {
+        // 显示卡片界面
+        waitingScreen.classList.add('hidden');
+        cardScreen.classList.remove('hidden');
+        
+        // 抽卡并显示
+        const card = drawCard();
+        setTimeout(() => {
+          showCard(card);
+          againBtn.disabled = false;
+        }, 100);
+      });
+    }
+
+    // 事件绑定
+    startBtn.addEventListener('click', startGame);
+    againBtn.addEventListener('click', againGame);
+  </script>
+</body>
+</html>
